@@ -4,10 +4,13 @@ namespace Ubiquity\controllers\traits;
 
 use Ubiquity\utils\base\UString;
 use Ubiquity\utils\base\UFileSystem;
+use Ubiquity\utils\http\headers\PhpHeaders;
+use Ubiquity\utils\http\headers\AbstractHeaders;
 
 trait StartupConfigTrait {
 	protected static $config;
 	protected static $ctrlNS;
+	protected static $headersInstance;
 	
 	public static function getConfig() {
 		return self::$config;
@@ -87,5 +90,17 @@ trait StartupConfigTrait {
 		}
 		return false;
 	}
+	
+	public static function getHeadersInstance(){
+		if(!isset(self::$headersInstance)){
+			self::$headersInstance=new PhpHeaders();
+		}
+		return self::$headersInstance;
+	}
+	
+	public static function setHeadersInstance(AbstractHeaders $headersInstance) {
+		self::$headersInstance = $headersInstance;
+	}
+
 }
 
