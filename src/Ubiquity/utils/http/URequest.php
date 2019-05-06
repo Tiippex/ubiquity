@@ -11,7 +11,7 @@ use Ubiquity\utils\base\UString;
  * This class is part of Ubiquity
  *
  * @author jcheron <myaddressmail@gmail.com>
- * @version 1.0.0
+ * @version 1.0.1
  *
  */
 class URequest {
@@ -69,9 +69,7 @@ class URequest {
 	 * Returns the query data, for PUT, DELETE PATCH methods
 	 */
 	public static function getInput() {
-		$put = array ();
-		\parse_str ( \file_get_contents ( 'php://input' ), $put );
-		return $put;
+		return Startup::getHeadersInstance()->getInput();
 	}
 
 	/**
@@ -101,7 +99,7 @@ class URequest {
 	 * @return string
 	 */
 	public static function getContentType() {
-		$headers = getallheaders ();
+		$headers = Startup::getHeadersInstance()->getAllHeaders();
 		if (isset ( $headers ["Content-Type"] )) {
 			return $headers ["Content-Type"];
 		}
@@ -254,7 +252,7 @@ class URequest {
 	 * @return string
 	 */
 	public static function getOrigin() {
-		$headers = getallheaders ();
+		$headers = Startup::getHeadersInstance()->getAllHeaders();
 		if (isset ( $headers ['Origin'] )) {
 			return $headers ['Origin'];
 		}

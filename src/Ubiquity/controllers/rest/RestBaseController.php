@@ -8,6 +8,7 @@ use Ubiquity\controllers\Startup;
 use Ubiquity\orm\DAO;
 use Ubiquity\utils\base\UString;
 use Ubiquity\controllers\Router;
+use Ubiquity\utils\http\UResponse;
 
 /**
  * Abstract base class for Rest controllers.
@@ -39,7 +40,7 @@ abstract class RestBaseController extends Controller {
 	protected $server;
 
 	public function __construct() {
-		if (! \headers_sent ()) {
+		if (! UResponse::isSent()) {
 			@\set_exception_handler ( array ($this,'_errorHandler' ) );
 			$this->config = Startup::getConfig ();
 			$this->server = $this->_getRestServer ();
@@ -48,8 +49,6 @@ abstract class RestBaseController extends Controller {
 			$this->server->_setContentType ( $this->contentType );
 			$this->restCache = CacheManager::getRestCacheController ( \get_class ( $this ) );
 		}
-		if (! $this->isValid ( Startup::getAction () ))
-			$this->onInvalidControl ();
 	}
 
 	public function index() {

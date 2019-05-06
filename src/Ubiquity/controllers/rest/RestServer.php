@@ -15,7 +15,7 @@ use Ubiquity\utils\http\URequest;
  * This class is part of Ubiquity
  *
  * @author jcheron <myaddressmail@gmail.com>
- * @version 1.0.6
+ * @version 1.0.7
  *
  */
 class RestServer {
@@ -39,7 +39,7 @@ class RestServer {
 
 	public function __construct(&$config, $headers = null) {
 		$this->config = $config;
-		$this->headers = [ 'Access-Control-Allow-Origin' => '*','Access-Control-Allow-Credentials' => 'true','Access-Control-Max-Age' => '86400','Access-Control-Allow-Methods' => 'GET, POST, OPTIONS, PUT, DELETE, PATCH, HEAD','Content-Type' => 'application/json; charset=utf8' ];
+		$this->headers = [ 'Access-Control-Allow-Origin' => '*','Access-Control-Allow-Credentials' => 'true','Access-Control-Max-Age' => '86400','Access-Control-Allow-Methods' => 'GET, POST, OPTIONS, PUT, DELETE, PATCH, HEAD' ];
 		if (is_array ( $headers )) {
 			$this->headers = array_merge ( $this->headers, $headers );
 		}
@@ -78,6 +78,9 @@ class RestServer {
 	public function _getHeaderToken() {
 		$authHeader = $this->_getHeader ( "Authorization" );
 		if ($authHeader !== false) {
+			if(is_array($authHeader)){
+				$authHeader=current($authHeader);
+			}
 			$headerDatas = explode ( " ", $authHeader, 2 );
 			if (sizeof ( $headerDatas ) === 2) {
 				list ( $type, $data ) = $headerDatas;
@@ -102,7 +105,7 @@ class RestServer {
 	}
 
 	public function _getHeader($header) {
-		$headers = getallheaders ();
+		$headers = Startup::getHeadersInstance()->getAllHeaders();
 		if (isset ( $headers [$header] )) {
 			return $headers [$header];
 		}
@@ -147,7 +150,7 @@ class RestServer {
 	protected function setAccessControlAllowOriginHeader() {
 		$origin = $this->getAllowedOrigin ();
 		unset ( $this->headers ['Access-Control-Allow-Origin'] );
-		\header ( 'Access-Control-Allow-Origin: ' . $origin, true );
+		Startup::getHeadersInstance()->header('Access-Control-Allow-Origin', $origin, true );
 	}
 
 	protected function addOtherHeaders() {
@@ -170,7 +173,7 @@ class RestServer {
 			} else
 				return;
 		}
-		\header ( trim ( $headerField ) . ": " . trim ( $value ), $replace );
+		Startup::getHeadersInstance()->header ( trim ( $headerField ),trim ( $value ), $replace );
 	}
 
 	/**
