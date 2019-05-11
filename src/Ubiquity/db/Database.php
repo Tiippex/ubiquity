@@ -21,7 +21,7 @@ use Ubiquity\db\providers\PDOWrapper;
  */
 class Database {
 	use DatabaseOperationsTrait;
-	public static $dbWrapper;
+	public static $dbWrapperClass;
 	private $dbType;
 	private $serverName;
 	private $port;
@@ -130,8 +130,8 @@ class Database {
 	}
 
 	public static function getAvailableDrivers() {
-		$dbWrapper = self::$dbWrapper ?? PDOWrapper::class;
-		return call_user_func ( $dbWrapper . '::getAvailableDrivers' );
+		$dbWrapperClass = self::$dbWrapperClass ?? PDOWrapper::class;
+		return call_user_func ( $dbWrapperClass . '::getAvailableDrivers' );
 	}
 
 	/**

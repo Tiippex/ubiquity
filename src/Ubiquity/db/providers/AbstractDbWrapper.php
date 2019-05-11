@@ -43,8 +43,5 @@ abstract class AbstractDbWrapper {
 
 	abstract public function fetchAllColumn($statement, array $values = null, string $column = null);
 
-	abstract public function executeStatement($statement, array $values);
-
 	abstract public function getTablesName();
 }
-

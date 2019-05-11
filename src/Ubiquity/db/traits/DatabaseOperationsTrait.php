@@ -16,7 +16,7 @@ use Ubiquity\db\providers\PDOWrapper;
  * @version 1.0.0
  * @property mixed $cache
  * @property array $options
- * @property string $dbWrapper
+ * @property string $dbWrapperClass
  */
 trait DatabaseOperationsTrait {
 
@@ -24,18 +24,18 @@ trait DatabaseOperationsTrait {
 	 *
 	 * @var \Ubiquity\db\providers\AbstractDbWrapper
 	 */
-	protected $pdoObject;
+	protected $wrapperObject;
 	private $statements = [ ];
 
 	abstract public function getDSN();
 
 	public function getPdoObject() {
-		return $this->pdoObject;
+		return $this->wrapperObject;
 	}
 
 	public function _connect() {
-		$dbWrapper = self::$dbWrapper ?? PDOWrapper::class;
-		$this->pdoObject = new $dbWrapper ( $this->getDSN (), $this->user, $this->password, $this->options );
+		$dbWrapperClass = self::$dbWrapperClass ?? PDOWrapper::class;
+		$this->wrapperObject = (new $dbWrapperClass ())->connect ( $this->getDSN (), $this->user, $this->password, $this->options );
 	}
 
 	/**
@@ -45,7 +45,7 @@ trait DatabaseOperationsTrait {
 	 * @return object|boolean
 	 */
 	public function query($sql) {
-		return $this->pdoObject->query ( $sql );
+		return $this->wrapperObject->query ( $sql );
 	}
 
 	/**
@@ -85,17 +85,17 @@ trait DatabaseOperationsTrait {
 
 	public function prepareAndFetchAll($sql, $parameters = null) {
 		$statement = $this->getStatement ( $sql );
-		return $this->pdoObject->fetchAll ( $statement, $parameters );
+		return $this->wrapperObject->fetchAll ( $statement, $parameters );
 	}
 
 	public function prepareAndFetchAllColumn($sql, $parameters = null, $column = null) {
 		$statement = $this->getStatement ( $sql );
-		return $this->pdoObject->fetchAllColumn ( $statement, $parameters, $column );
+		return $this->wrapperObject->fetchAllColumn ( $statement, $parameters, $column );
 	}
 
 	public function prepareAndFetchColumn($sql, $parameters = null, $columnNumber = null) {
 		$statement = $this->getStatement ( $sql );
-		return $this->pdoObject->fetchColumn ( $statement, $parameters, $columnNumber );
+		return $this->wrapperObject->fetchColumn ( $statement, $parameters, $columnNumber );
 	}
 
 	/**
@@ -105,7 +105,7 @@ trait DatabaseOperationsTrait {
 	 */
 	private function getStatement($sql) {
 		if (! isset ( $this->statements [$sql] )) {
-			$this->statements [$sql] = $this->pdoObject->getStatement ( $sql );
+			$this->statements [$sql] = $this->wrapperObject->getStatement ( $sql );
 		}
 		return $this->statements [$sql];
 	}
@@ -117,7 +117,7 @@ trait DatabaseOperationsTrait {
 	 * @return int the number of rows that were modified or deleted by the SQL statement you issued
 	 */
 	public function execute($sql) {
-		return $this->pdoObject->execute ( $sql );
+		return $this->wrapperObject->execute ( $sql );
 	}
 
 	/**
@@ -127,15 +127,15 @@ trait DatabaseOperationsTrait {
 	 * @return object|boolean
 	 */
 	public function prepareStatement($sql) {
-		return $this->pdoObject->prepareStatement ( $sql );
+		return $this->wrapperObject->prepareStatement ( $sql );
 	}
 
 	public function executeStatement($statement, array $values = null) {
-		return $this->pdoObject->executeStatement ( $statement, $values );
+		return $this->wrapperObject->executeStatement ( $statement, $values );
 	}
 
 	public function statementRowCount($statement) {
-		return $this->pdoObject->statementRowCount ( $statement );
+		return $this->wrapperObject->statementRowCount ( $statement );
 	}
 
 	/**
@@ -147,7 +147,7 @@ trait DatabaseOperationsTrait {
 	 * @return boolean
 	 */
 	public function bindValueFromStatement($statement, $parameter, $value) {
-		return $this->pdoObject->bindValueFromStatement ( $statement, ":" . $parameter, $value );
+		return $this->wrapperObject->bindValueFromStatement ( $statement, ":" . $parameter, $value );
 	}
 
 	/**
@@ -156,11 +156,11 @@ trait DatabaseOperationsTrait {
 	 * @return string
 	 */
 	public function lastInserId() {
-		return $this->pdoObject->lastInsertId ();
+		return $this->wrapperObject->lastInsertId ();
 	}
 
 	public function getTablesName() {
-		return $this->pdoObject->getTablesName ();
+		return $this->wrapperObject->getTablesName ();
 	}
 
 	/**
@@ -172,23 +172,22 @@ trait DatabaseOperationsTrait {
 	public function count($tableName, $condition = '') {
 		if ($condition != '')
 			$condition = " WHERE " . $condition;
-		return $this->pdoObject->queryColumn ( "SELECT COUNT(*) FROM " . $tableName . $condition );
+		return $this->wrapperObject->queryColumn ( "SELECT COUNT(*) FROM " . $tableName . $condition );
 	}
 
 	public function queryColumn($query, $columnNumber = null) {
-		return $this->pdoObject->queryColumn ( $query, $columnNumber );
+		return $this->wrapperObject->queryColumn ( $query, $columnNumber );
 	}
 
 	public function fetchAll($query) {
-		return $this->pdoObject->queryAll ( $query );
+		return $this->wrapperObject->queryAll ( $query );
 	}
 
 	public function isConnected() {
-		return ($this->pdoObject !== null && $this->ping ());
+		return ($this->wrapperObject !== null && $this->ping ());
 	}
 
 	public function ping() {
-		return ($this->pdoObject && 1 === intval ( $this->pdoObject->queryColumn ( 'SELECT 1', 0 ) ));
+		return ($this->wrapperObject && 1 === intval ( $this->wrapperObject->queryColumn ( 'SELECT 1', 0 ) ));
 	}
 }
-

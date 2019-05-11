@@ -61,7 +61,8 @@ class PDOWrapper extends AbstractDbWrapper {
 
 	public function connect($dsn, $user, $password, array $options) {
 		$options [\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_EXCEPTION;
-		return $this->dbInstance = new \PDO ( $dsn, $user, $password, $options );
+		$this->dbInstance = new \PDO ( $dsn, $user, $password, $options );
+		return $this;
 	}
 
 	public function bindValueFromStatement($statement, $parameter, $value) {
@@ -93,4 +94,3 @@ class PDOWrapper extends AbstractDbWrapper {
 		return $statement->rowCount ();
 	}
 }
-
