@@ -8,18 +8,20 @@ namespace Ubiquity\db;
 use Ubiquity\exceptions\CacheException;
 use Ubiquity\db\traits\DatabaseOperationsTrait;
 use Ubiquity\exceptions\DBException;
+use Ubiquity\db\providers\PDOWrapper;
 
 /**
- * Ubiquity PDO database class.
+ * Ubiquity Database class.
  * Ubiquity\db$Database
  * This class is part of Ubiquity
  *
  * @author jcheron <myaddressmail@gmail.com>
- * @version 1.0.4
+ * @version 1.1.0
  *
  */
 class Database {
 	use DatabaseOperationsTrait;
+	public static $dbWrapper;
 	private $dbType;
 	private $serverName;
 	private $port;
@@ -64,7 +66,7 @@ class Database {
 	}
 
 	/**
-	 * Creates the PDO instance and realize a safe connection.
+	 * Creates the DB instance and realize a safe connection.
 	 *
 	 * @throws DBException
 	 * @return boolean
@@ -73,7 +75,7 @@ class Database {
 		try {
 			$this->_connect ();
 			return true;
-		} catch ( \PDOException $e ) {
+		} catch ( \Exception $e ) {
 			throw new DBException ( $e->getMessage (), $e->getCode (), $e->getPrevious () );
 		}
 	}
@@ -128,7 +130,8 @@ class Database {
 	}
 
 	public static function getAvailableDrivers() {
-		return \PDO::getAvailableDrivers ();
+		$dbWrapper = self::$dbWrapper ?? PDOWrapper::class;
+		return call_user_func ( $dbWrapper . '::getAvailableDrivers' );
 	}
 
 	/**

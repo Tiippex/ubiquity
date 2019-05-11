@@ -16,8 +16,8 @@ use Ubiquity\orm\parser\Reflexion;
  * This class is part of Ubiquity
  *
  * @author jcheron <myaddressmail@gmail.com>
- * @version 1.0.2
- *
+ * @version 1.1.0
+ * @property \Ubiquity\db\Database $db
  */
 trait DAOUpdatesTrait {
 
@@ -46,8 +46,8 @@ trait DAOUpdatesTrait {
 			self::$db->bindValueFromStatement ( $statement, $key, $value );
 		}
 		try {
-			if ($statement->execute ()) {
-				return $statement->rowCount ();
+			if (self::$db->executeStatement ( $statement )) {
+				return self::$db->statementRowCount ( $statement );
 			}
 		} catch ( \PDOException $e ) {
 			Logger::warn ( "DAOUpdates", $e->getMessage (), "delete" );
@@ -67,10 +67,10 @@ trait DAOUpdatesTrait {
 		Logger::info ( "DAOUpdates", $sql, "delete" );
 		$statement = self::$db->prepareStatement ( $sql );
 		try {
-			if ($statement->execute ()) {
-				return $statement->rowCount ();
+			if (self::$db->executeStatement ( $statement )) {
+				return self::$db->statementRowCount ( $statement );
 			}
-		} catch ( \PDOException $e ) {
+		} catch ( \Exception $e ) {
 			Logger::warn ( "DAOUpdates", $e->getMessage (), "delete" );
 			return false;
 		}
@@ -124,7 +124,7 @@ trait DAOUpdatesTrait {
 			self::$db->bindValueFromStatement ( $statement, $key, $value );
 		}
 		try {
-			$result = $statement->execute ();
+			$result = self::$db->executeStatement ( $statement );
 			if ($result) {
 				$pk = OrmUtils::getFirstKey ( get_class ( $instance ) );
 				$accesseurId = "set" . ucfirst ( $pk );
@@ -140,7 +140,7 @@ trait DAOUpdatesTrait {
 			}
 			EventsManager::trigger ( DAOEvents::AFTER_INSERT, $instance, $result );
 			return $result;
-		} catch ( \PDOException $e ) {
+		} catch ( \Exception $e ) {
 			Logger::warn ( "DAOUpdates", $e->getMessage (), "insert" );
 		}
 		return false;
@@ -192,7 +192,7 @@ trait DAOUpdatesTrait {
 					}
 					self::$db->bindValueFromStatement ( $statement, $myField, $id );
 					self::$db->bindValueFromStatement ( $statement, $field, $foreignId );
-					$statement->execute ();
+					self::$db->executeStatement ( $statement );
 					Logger::info ( "DAOUpdates", "Insertion des valeurs dans la table association '" . $parser->getJoinTable () . "'", "InsertMany" );
 				}
 			}
@@ -222,13 +222,13 @@ trait DAOUpdatesTrait {
 			self::$db->bindValueFromStatement ( $statement, $key, $value );
 		}
 		try {
-			$result = $statement->execute ();
+			$result = self::$db->executeStatement ( $statement );
 			if ($result && $updateMany)
 				self::insertOrUpdateAllManyToMany ( $instance );
 			EventsManager::trigger ( DAOEvents::AFTER_UPDATE, $instance, $result );
 			$instance->_rest = array_merge ( $instance->_rest, $ColumnskeyAndValues );
 			return $result;
-		} catch ( \PDOException $e ) {
+		} catch ( \Exception $e ) {
 			Logger::warn ( "DAOUpdates", $e->getMessage (), "update" );
 		}
 		return false;
