@@ -147,7 +147,7 @@ trait DatabaseOperationsTrait {
 	 * @return boolean
 	 */
 	public function bindValueFromStatement($statement, $parameter, $value) {
-		return $this->wrapperObject->bindValueFromStatement ( $statement, ":" . $parameter, $value );
+		return $this->wrapperObject->bindValueFromStatement ( $statement, $parameter, $value );
 	}
 
 	/**

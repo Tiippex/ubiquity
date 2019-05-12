@@ -27,13 +27,13 @@ abstract class AbstractDbWrapper {
 
 	abstract public function execute(string $sql);
 
-	abstract public function prepareStatement(array $sql);
+	abstract public function prepareStatement(string $sql);
 
 	abstract public function executeStatement($statement, array $values = null);
 
 	abstract public function statementRowCount($statement);
 
-	abstract public function lastInserId();
+	abstract public function lastInsertId();
 
 	abstract public function bindValueFromStatement($statement, $parameter, $value);
 

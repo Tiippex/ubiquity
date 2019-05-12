@@ -21,7 +21,7 @@ class PDOWrapper extends AbstractDbWrapper {
 		return $result;
 	}
 
-	public function lastInserId() {
+	public function lastInsertId() {
 		return $this->dbInstance->lastInsertId ();
 	}
 
@@ -38,7 +38,7 @@ class PDOWrapper extends AbstractDbWrapper {
 		return \PDO::getAvailableDrivers ();
 	}
 
-	public function prepareStatement(array $sql) {
+	public function prepareStatement(string $sql) {
 		return $this->dbInstance->prepare ( $sql );
 	}
 
