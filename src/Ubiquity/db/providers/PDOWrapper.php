@@ -59,10 +59,14 @@ class PDOWrapper extends AbstractDbWrapper {
 		return $this->dbInstance->exec ( $sql );
 	}
 
-	public function connect($dsn, $user, $password, array $options) {
+	public function connect(string $dbType, $dbName, $serverName, string $port, string $user, string $password, array $options) {
 		$options [\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_EXCEPTION;
-		$this->dbInstance = new \PDO ( $dsn, $user, $password, $options );
+		$this->dbInstance = new \PDO ( $this->getDSN ( $serverName, $port, $dbName, $dbType ), $user, $password, $options );
 		return $this;
+	}
+
+	public function getDSN(string $serverName, string $port, string $dbName, string $dbType = 'mysql') {
+		return $dbType . ':dbname=' . $dbName . ';host=' . $serverName . ';charset=UTF8;port=' . $port;
 	}
 
 	public function bindValueFromStatement($statement, $parameter, $value) {

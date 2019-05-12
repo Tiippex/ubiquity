@@ -35,7 +35,7 @@ trait DatabaseOperationsTrait {
 
 	public function _connect() {
 		$dbWrapperClass = self::$dbWrapperClass ?? PDOWrapper::class;
-		$this->wrapperObject = (new $dbWrapperClass ())->connect ( $this->getDSN (), $this->user, $this->password, $this->options );
+		$this->wrapperObject = (new $dbWrapperClass ())->connect ( $this->dbType, $this->dbName, $this->serverName, $this->port, $this->user, $this->password, $this->options );
 	}
 
 	/**

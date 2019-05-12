@@ -81,7 +81,7 @@ class Database {
 	}
 
 	public function getDSN() {
-		return $this->dbType . ':dbname=' . $this->dbName . ';host=' . $this->serverName . ';charset=UTF8;port=' . $this->port;
+		return $this->wrapperObject->getDSN ( $this->serverName, $this->port, $this->dbName, $this->dbType );
 	}
 
 	/**
